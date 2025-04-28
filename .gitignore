@@ -1,0 +1,14 @@
+*.csv
+*.pyc
+*.zip
+*.dump
+*.pkl
+.vscode/
+__pycache__/
+models/
+data/
+tutos/
+process/config.json
+webserver/config.json
+temp/
+*.tmp.driveupload

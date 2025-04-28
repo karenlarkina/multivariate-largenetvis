@@ -1,0 +1,27 @@
+.node-link-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#idLabelNodeLink {
+  font-weight: bold;
+  font-size: 15px;
+  flex: 1;
+  text-align: center;
+}
+
+.node-link-header:hover .fullscreen-icon {
+  visibility: visible;
+}
+
+#nodelink_diagram_div {
+  visibility: hidden;
+  height: 97.5%;
+  padding-bottom: 30px;
+}
+
+.no-color {
+  filter: grayscale(50%);
+}

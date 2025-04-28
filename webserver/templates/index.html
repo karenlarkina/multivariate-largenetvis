@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <!-- Favicon icon -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/static/assets/images/favicon.png"
+        >
+        <title>LargeNetVis</title>
+        <!-- Bootstrap Core CSS -->
+        <link href="/static/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Custom CSS -->
+        <link href="/static/css/style.css" rel="stylesheet">
+        <!-- Global View CSS -->
+        <link href="/static/css/views/global_view.css" rel="stylesheet">
+        <!-- Node-link View CSS -->
+        <link href="/static/css/views/node-link.css" rel="stylesheet">
+        <!-- You can change the theme colors from here -->
+        <link href="/static/css/colors/default.css" id="theme" rel="stylesheet">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+        <script src="https://d3js.org/d3.v5.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+        
+        <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+
+        <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
+	 <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+	        
+    </head>
+    
+    <body>
+
+        <!-- Side Nav -->
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+            <form id="formUploadFiles" enctype = "multipart/form-data">
+                 
+                <p>Select your network:</p>
+
+                <input type="radio" name="network_radio" value="1_primarySchool_firstDay" checked/> Primary School (first day)<br />
+                
+                <br />
+                <button id="submitForm" type="submit" class="btn btn-primary">Ok</button>
+                 
+            </form>
+                <br /><br />
+                <div id="network_Info_menu"></div>
+                <br />
+                <select disabled name="sampling_method_input" id="sampling_method_input">
+                    <option value="noSampling" selected="selected"> No Sampling</option>
+                    <option value="nodeRandomSampling"> Random Node Sampling</option>
+                    <option value="edgeRandomSampling" > Random Edge Sampling</option>
+                    <option value="snowballSampling" > Snowball Sampling</option>
+
+                </select> 
+                <div class="range-slider">
+                    <span id="rs-bullet" class="rs-label"></span>
+                    <br />
+                    <input disabled id="rs-rangeSampling-line" class="rs-range" type="range" value="0" min="0" max="100" step = 1>                  
+                </div>
+
+                <div id="range-slider_communityFiltering">
+                    <span id="rs-bullet_communityFiltering" class="rs-label_communityFiltering">Discard communities with less than 0 nodes.</span> 
+            <!--            <span id="rs-bullet_communityFiltering" class="rs-label_communityFiltering">Discard communities with less than 10 nodes.</span>-->
+                    <br />
+                    <input disabled id="rs-rangeSampling-line_communityFiltering" class="rs-range" type="range" value="0" min="0" max="100" step = 1>                  
+                </div>
+
+                <div id="range-slider_minimumSizeForSuperNode">
+                    <span id="rs-bullet_minimumSizeForSuperNode" class="rs-label_minimumSizeForSuperNode">Summarize communities with more than 20 nodes.</span>
+                    <br />
+                    <input disabled id="rs-rangeSampling-line_minimumSizeForSuperNode" class="rs-range" type="range" value="100" min="10" max="100" step = 1>                  
+                </div>
+
+                <div id="range-slider_sigma">
+                    <!--<span id="rs-bullet_sigma" class="rs-label_sigma">Use jaccard = 0.5 for community matching.</span> -->
+                    <span id="rs-bullet_sigma" class="rs-label_sigma">Use jaccard = 0.4 for community matching.</span>
+                    <br />
+                    <input disabled id="rs-rangeSampling-line_sigma" class="rs-range" type="range" value="0.4" min="0.1" max="0.5" step = 0.1>
+                </div>
+
+                <button id="submitSampling" class="btn btn-primary">Open</button>
+                <br /><br />
+
+                <button disabled id="saveButton" class="btn btn-primary">Export .png</button>
+
+                
+      
+            <!--<a href="#">About us</a>-->
+        </div>
+
+        <!-- Main Div (background div) -->
+        <div class="container-fluid" id="main">
+            
+            <!-- Use any element to open the sidenav -->
+            <div id="column-container">
+                <div>
+                    <span id="menuButton" style="font-size:25px;cursor:pointer" onclick="openNav()">&#9776; LargeNetVis</span>
+                    <div id="flash"></div>
+                </div>
+                <div id="left-section">
+                    <label for="global-view-select">Attribute:</label>
+                    <select disabled id="global-view-select" class="custom-select-sm" onchange="handleSelectChange(event)">
+                        <option value="NL" selected>Node Label</option>
+                        <option value="EL">Edge Label</option>
+<!--                        <option value="NLEL">Node and Edge Label</option>-->
+                    </select>
+                </div>
+            </div>
+
+                
+            <div class="row semifull-heigth">
+                <div class="col-sm-12 full-heigth">
+                    <div class="card full-heigth">
+                        <div class="card-body">
+                            <div class="views-container full-heigth">
+                                
+                                <!-- Left Side -->
+                                 <!-- <div id="leftSideDivContainer"> -->
+                                <div
+                                        class="tab-pane show active full-heigth shadow mb-3 bg-white rounded"
+                                        id="matrix_taxonomies"
+                                        role="tabpanel"
+                                        aria-labelledby="matrix_taxonomies"
+                                        style="padding:20px"
+                                    >
+                                            <div class="toolbar_matrix_taxonomies"> 
+                                               
+                                                <div class="wrapper">
+                                                    <div id="dragOptions" class="container">
+                                                      <div class="drag_coordinate">a</div>
+                                                      <div class="drag_coordinate">b</div>
+                                                    </div>
+                                                    <div id="dragChosenOptions" class="container">
+                                                        <div class="drag_coordinate">1</div>
+                                                        <div class="drag_coordinate">2</div>
+                                                    </div> 
+                                                </div> 
+                                                 <div id="matrixTitle">
+                                                    <span id="helperLeft" title="blabla" style="visibility: hidden;"></span>
+                                                    <div style="text-align:center;">
+                                                        <label style="font-weight:bold;font-size:15px;">Taxonomy Matrix</label>
+                                                    </div>
+                                                </div>
+                                                  
+                                                <div id="matrixToolbar">
+                                                    <label>X:</label>
+                                                    <select class="custom-select-sm" name="x" id="x" style="width: 140px">
+                                                        <option value="ST" >Structural tax.</option>
+                                                        <option value="TT" selected="selected">Temporal tax.</option>
+                                                        <option value="ET">Evolution tax.</option>
+                                                    </select> 
+
+                                                    <label>Y:</label>
+
+                                                    <select class="custom-select-sm form-select-sm" name="y" id="y" style="width: 140px">
+                                                        <option value="ST"  selected="selected">Structural tax.</option>
+                                                        <option value="TT">Temporal tax.</option>
+                                                        <option value="ET">Evolution tax.</option>
+                                                    </select> 
+                                                    <button id='changeButton' type="button" class="btn btn-secondary btn-sm">Change</button>
+                                                </div>
+                                            </div>
+                                        </div> 
+
+                                         <div
+                                        class="tab-pane float-left shadow mb-3 bg-white rounded"
+                                        id="statistics_div"
+                                        role="tabpanel"
+                                        aria-labelledby="statistics_div"
+                                        style="padding:20px"
+                                        >
+                                        <div style="text-align:center;">
+                                            <label style="font-weight:bold;font-size:15px;" id="name_detailDiv">Network detail</label>
+                                        </div>
+                                        <span id="helperLeft" title="blabla" style="visibility: hidden;"></span>
+                                        <table class="table table-striped" id="statistics_table">
+                                            <thead>
+                                              <tr>
+                                                <th scope="col">Metric</th>
+                                                <th style="text-align: right" scope="col">Value</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              <tr>
+                                                <td id="label_metric1">Number of nodes</td>
+                                                <td style="text-align: right" id="value_metric1"></td>
+                                              </tr>
+                                              <tr>
+                                                <td id="label_metric2">Number of edges</td>
+                                                <td style="text-align: right" id="value_metric2"></td>
+                                              </tr>
+                                              <tr>
+                                                <td id="label_metric3">Number of timestamps</td>
+                                                <td style="text-align: right" id="value_metric3"></td>
+                                              </tr>
+                                              <tr>
+                                                <td id="label_metric4">Number of detected communities</td>
+                                                <td style="text-align: right" id="value_metric4"></td>
+                                              </tr>
+                                              <tr>
+                                                <td id="label_metric5">Mean modularity</td>
+                                                <td style="text-align: right" id="value_metric5"></td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+
+                                        </div>
+
+
+                                <!-- </div> -->
+
+                                <!-- Global View -->
+                                <div
+                                class="tab-pane full-heigth float-left shadow p-10 bg-white rounded"
+                                id="global_view"
+                                role="tabpanel"
+                                aria-labelledby="global_view"
+                                ondblclick="toggleFullScreen(document.getElementById('global_view'))"
+                                >
+                                <div class="global-view-header">
+                                    <!-- <span id="helperMid" title="blabla" style="visibility: hidden;"></span> -->
+                                    <label id="global-view-title">Global View</label>
+                                    <span class="fullscreen-icon">
+                                        <i class="bi bi-arrows-fullscreen" 
+                                        onclick="toggleFullScreen(document.getElementById('global_view'))"
+                                        ></i>
+                                    </span>
+                                </div>
+                                <div id="container-circuit" class="nav-tabs">
+<!--                                    <div id="left-section">-->
+<!--                                        <label for="global-view-select">Attribute:</label>-->
+<!--                                        <select id="global-view-select" class="custom-select-sm" onchange="handleSelectChange(event)">-->
+<!--                                            <option value="NL" selected>Node Label</option>-->
+<!--                                            <option value="EL">Edge Label</option>-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+                                    <ul id="toolbar-circuit" class="nav">
+                                        <li style="flex-grow: 1;">
+                                            <div id="colorbar_labels"></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="static-global-labels">
+                                    <div id="horizontal-label"><h2>Timeslices</h2></div>
+                                    <div id="vertical-label"><h2>Communities</h2></div>
+                                    <!-- Global View -->
+                                    <svg id="svg_global_view" class="overflow-scroll" style="margin: 0; padding-bottom: 40px; padding-left: 30px; cursor: move; overflow: auto"></svg>
+                                </div>
+                                </div>
+                                <!-- Node-link diagram -->
+                                <div
+                                class="tab-pane full-heigth float-left shadow p-10 mb-2 ml-2 bg-white rounded"
+                                role="tabpanel"
+                                id="node-link-container"
+                                aria-labelledby="node-link-container"
+                                ondblclick="toggleFullScreen(document.getElementById('node-link-container'))"
+                                >
+                                <div class="node-link-header">
+                                    <label id="idLabelNodeLink">Node-link Diagram</label>
+                                    <span class="fullscreen-icon">
+                                        <i class="bi bi-arrows-fullscreen" 
+                                        onclick="toggleFullScreen(document.getElementById('node-link-container'))"
+                                        ></i>
+                                    </span>
+                                </div>
+                                
+                                <div
+                                class="tab-pane full-heigth shadow bg-white rounded"
+                                id="nodelink_diagram_div"
+                                aria-labelledby="nodelink_diagram_div"
+                                >
+                                <ul id= "labels-list" class="nav nav-tabs">
+<!--                                     <li class="d3colorbar"><p style="font-size:15px;  display: inline-block; float:left;">Labels:&nbsp;&nbsp;&nbsp;</p><p id="minSizep" style="font-size:15px; width: 15px; float:left;"></p>&nbsp;&nbsp;&nbsp;<div id="colorbar_circuito" style="float:left;"></div><p id="maxSizep" style="font-size:15px; display: inline-block; float:left;"></p></li>-->
+                                    <li style="width: 100%; flex-grow: 1; margin-top: 10px; margin-bottom: 10px"> <div id="node-link-labels"> </div> </li>
+<!--                                    <li style="width: 100%; flex-grow: 1; margin-top: 10px; margin-bottom: 10px"> <div id="edge-labels"> </div> </li>-->
+                                </ul>
+                                </div>
+                            </div>
+                                
+                                <!-- Temporal Activity Map -->
+                                <div
+                                    class="tab-pane full-heigth float-left shadow  mb-2 ml-2 bg-white rounded"
+                                    id="temporal_activity_map_div"
+                                    role="tabpanel"
+                                    aria-labelledby="temporal_activity_map_div"
+                                    style="padding:20px"
+                                >
+                                    <div style="text-align:center;">
+                                        <label style="font-weight:bold;font-size:15px;">Temporal Activity Map</label>
+                                    </div>
+                                    <span id="helperTAM" title="blabla" style="visibility: hidden;"></span>
+                                
+                                <!--<svg id="labels_svg"></svg> -->
+                                
+                                </div>
+                                    
+                                <!--<div
+                                    class="tab-pane full-heigth float-left shadow ml-3 bg-white rounded"
+                                    id="linechart_div"
+                                    role="tabpanel"
+                                    aria-labelledby="linechart_div"
+                                >
+                                </div> -->
+                                <!-- Input color -->
+                                <div style="display: none" style = "position: relative;">
+                                    <input type="color" id="new_color" color="green">
+                                </div>
+                                                                    
+                            </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            /* Set the width of the side navigation to 250px and the left margin of the page content to 250px and add a black background color to body */
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "250px";
+                document.getElementById("main").style.marginLeft = "250px";
+                document.getElementById("menuButton").style.display = "none";
+                
+                //document.body.style.backgroundColor = "rgba(0,0,0,0.4)"; //discomment if you want Sidenav Push Content w/ opacity
+            }
+
+            /* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("main").style.marginLeft = "0";
+                document.getElementById("menuButton").style.display = "flex";
+                //document.body.style.backgroundColor = "white";  //discomment if you want Sidenav Push Content w/ opacity
+            }
+          
+        </script>
+      
+        <!-- D3.layout.cloud (based on http://using-d3js.com/07_01_word_clouds.html) -->
+        <script src="/static/assets/plugins/word-cloud/d3.layout.cloud.js"></script>
+
+        <!-- D3.colorbar (https://github.com/bmschmidt/colorbar) -->
+        <script src="/static/assets/plugins/d3-colorbar/d3-colorbar.js"></script>
+        
+        <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+        
+        <!-- Bootstrap tether Core JavaScript -->
+        <script src="/static/assets/plugins/bootstrap/js/tether.min.js"></script>
+        <script src="/static/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- Bootstrap icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        
+        <!--Custom JavaScript -->
+        <script src="/static/js/custom.min.js"></script>
+
+        <!-- ============================================================== -->
+        <!-- Custom -->
+        <!-- ============================================================== -->
+
+        <!-- D3.metro (https://github.com/supervergil/d3-metro) -->
+        <script src="/static/assets/plugins/d3-metro/metro.js"></script>
+        <script src="/static/assets/plugins/d3-ForceEdgeBundling/d3-ForceEdgeBundling.js"></script>
+
+        <!-- https://github.com/haljin/js-louvain/blob/master/src/Graph.js -->
+        <script src="/static/assets/plugins/jLouvain/jLouvain.js"></script>
+        
+        <script src="/static/js/utils.js"></script>
+        <script src="/static/js/ui-utils.js"></script>
+        <script src="/static/js/ajaxutil.js"></script>
+        <script src="/static/js/firstView.js"></script>
+        <script src="/static/js/tools/ui.js"></script>
+        <script src="/static/js/index.js"></script>
+        
+    </body>
+</html>

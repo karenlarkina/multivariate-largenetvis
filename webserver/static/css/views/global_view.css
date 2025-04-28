@@ -1,0 +1,76 @@
+.global-view-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bi-arrows-fullscreen {
+  font-size: 1.2rem;
+}
+
+.global-view-header:hover .fullscreen-icon {
+  visibility: visible;
+}
+
+.fullscreen-icon {
+  visibility: hidden;
+}
+
+#column-container {
+  display: flex;
+}
+
+#global-view-title {
+  font-weight: bold;
+  font-size: 15px;
+  flex: 1;
+  text-align: center;
+}
+
+#container-circuit {
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+}
+
+#left-section {
+  display: flex;
+  align-items: center;
+}
+
+#left-section label {
+  margin-left: 20px;
+  margin-right: 10px;
+  margin-bottom: 0;
+  align-content: center;
+}
+
+#toolbar-circuit {
+  flex-grow: 1;
+}
+
+#colorbar_labels {
+  padding: 10px;
+}
+
+#static-global-labels {
+  display: none;
+  background-color: transparent;
+  position: relative;
+}
+
+#horizontal-label {
+  text-align: center;
+}
+
+#vertical-label { /* Static Communities label in global view behind the  */
+  position: fixed;
+  left: 1em;
+  padding-bottom: 7px;
+  top: 32%;
+  transform: translate(-1.75em, 10em) rotate(-90deg);
+  transform-origin: center;
+  text-align: center;
+  pointer-events: none;
+}
