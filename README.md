@@ -12,7 +12,7 @@ Follows a video to demonstrate the Multivariate LargeNetVis system's main funcio
 
 [//]: # (Create a new video introducing the system and showing how the tool can be used, should showcase some of the interesting cases from the case study.)
 
-[Multivariate_LargeNetVis.mp4](videos/Multivariate_LargeNetVis.mp4)
+[Multivariate_LargeNetVis.mp4](./Multivariate_LargeNetVis.mp4)
 
 
 ## Software demonstration
