@@ -8,11 +8,11 @@ This project presents an improved version of the tool _LargeNetVis_ [[1]](https:
 
 ## Video demonstration
 
-Follows a video to demonstrate the Multivariate LargeNetVis system's main funcionalities.
+Follows a video to demonstrate the Multivariate LargeNetVis system's main functionalities.
 
 [//]: # (Create a new video introducing the system and showing how the tool can be used, should showcase some of the interesting cases from the case study.)
 
-[![Multivariate_LargeNetVis.mp4](https://img.youtube.com/vi/0MkXjz92vcc/0.jpg)](https://www.youtube.com/watch?v=0MkXjz92vcc)
+[![Multivariate_LargeNetVis.mp4](./images/video-img.png)](https://www.youtube.com/watch?v=0MkXjz92vcc)
 
 ## Software demonstration
 
