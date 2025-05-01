@@ -12,7 +12,7 @@ Follows a video to demonstrate the Multivariate LargeNetVis system's main functi
 
 [//]: # (Create a new video introducing the system and showing how the tool can be used, should showcase some of the interesting cases from the case study.)
 
-[![Video: Visualizing Communities in Dynamic Multivariate Networks](https://img.youtube.com/vi/8En9Ipw-Z_0/0.jpg)](https://www.youtube.com/watch?v=8En9Ipw-Z_0)
+[![Video: Visualizing Communities in Dynamic Multivariate Networks](https://img.youtube.com/vi/ewmi_PKYdqI/0.jpg)](https://www.youtube.com/watch?v=ewmi_PKYdqI)
 
 ## Software demonstration
 
